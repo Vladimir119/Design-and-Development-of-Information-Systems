@@ -1,0 +1,20 @@
+$ docker compose ps
+NAME                   IMAGE                  COMMAND                  SERVICE   CREATED          STATUS                    PORTS
+lab2-compose-app-1     lab2-compose-app:1.0   "python /app/app.pyc"    app       29 seconds ago   Up 23 seconds (healthy)   8080/tcp
+lab2-compose-db-1      postgres:17.6-alpine   "docker-entrypoint.s…"   db        29 seconds ago   Up 6 seconds (healthy)    
+lab2-compose-nginx-1   nginx:1.28.0-alpine    "/docker-entrypoint.…"   nginx     29 seconds ago   Up 17 seconds (healthy)   0.0.0.0:80->80/tcp, [::]:80->80/tcp
+$ curl -i localhost/health
+HTTP/1.1 200 OK
+Server: nginx/1.28.0
+Date: Sun, 25 Oct 2026 20:04:54 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 34
+Connection: keep-alive
+
+{"status": "ok", "database": "ok"}
+$ curl localhost/
+{"message": "Lab 2", "visits": 3}
+visits before down/up: 1
+visits after down/up: 2
+app/db: no published ports; app UID: 10001
+Database stopped: /health returned 503; database restarted: healthy
