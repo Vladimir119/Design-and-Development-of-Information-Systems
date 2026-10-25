@@ -15,7 +15,7 @@ if [[ $keyword == *$'\n'* ]]; then
     echo 'Ключевое слово должно занимать одну строку.' >&2
     exit 1
 fi
-# A separate directory prevents overwriting the input or previous reports.
+# Для каждого запуска создаем отдельную папку.
 directory=$(mktemp -d ./log_report.XXXXXX)
 complete=0
 trap 'if (( ! complete )); then rm -rf -- "$directory"; fi' EXIT

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Linux: Bash, /proc, GNU coreutils, awk, flock (util-linux).
+# Мониторинг ресурсов Linux.
 set -euo pipefail
 export LC_ALL=C
 umask 077
@@ -33,7 +33,7 @@ worker() {
     printf '%s\n' "$pid" > "$pidfile"
     pause() { sleep "$1" 9>&- & child=$!; wait "$child"; child=''; }
     cpu_snapshot() {
-        # guest and guest_nice are already included in user and nice.
+        # guest и guest_nice уже входят в user и nice.
         awk '/^cpu / { total=0; for(i=2;i<=9;i++) total+=$i; print total, $5+$6; exit }' /proc/stat
     }
     local total1 idle1 total2 idle2 cpu memory disk load timestamp day report started remaining
@@ -59,7 +59,7 @@ worker() {
 }
 
 if [[ ${1:-} == __worker ]]; then
-    # Internal mode requires the lock descriptor inherited from START.
+    # Фоновый процесс получает блокировку от START.
     [[ $# == 3 && -e /proc/$$/fd/9 ]] || exit 1
     worker "$2" "$3"
     exit
@@ -68,7 +68,7 @@ if [[ $# != 1 || ! $1 =~ ^(START|STOP|STATUS)$ ]]; then
     echo "Использование: $0 START|STOP|STATUS" >&2
     exit 1
 fi
-# Serialize control commands; the worker retains only the lifetime lock (9).
+# Блокировка 8 — для команд управления, 9 — на время работы монитора.
 exec 8> "$state/control.lock"
 flock 8
 exec 9> "$state/worker.lock"

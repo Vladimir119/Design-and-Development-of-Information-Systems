@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Compare branch snapshots, from branch 1 to branch 2.
+# Сравнение двух веток.
 set -euo pipefail
 export LC_ALL=C
 
@@ -22,7 +22,7 @@ git -C "$temporary/repo" fetch --quiet --no-tags --depth=1 -- "$repository" \
     "refs/heads/$branch1:refs/reports/first"
 git -C "$temporary/repo" fetch --quiet --no-tags --depth=1 -- "$repository" \
     "refs/heads/$branch2:refs/reports/second"
-# Disable rename detection so that all ordinary changes are A, M or D.
+# Переименование считаем удалением и добавлением.
 git -C "$temporary/repo" diff --no-renames --name-status -z \
     refs/reports/first refs/reports/second > "$temporary/changes"
 total=0 added=0 deleted=0 modified=0 other=0
@@ -34,10 +34,10 @@ while IFS= read -r -d '' status && IFS= read -r -d '' path; do
         M) ((modified+=1));;
         *) ((other+=1));;
     esac
-    # %q preserves spaces, tabs and newlines in unusual filenames on one line.
+    # Экранируем пробелы и переводы строк в именах файлов.
     printf '%s\t%q\n' "$status" "$path" >> "$temporary/list"
 done < "$temporary/changes"
-# Escape unsafe bytes instead of turning a slash in a branch into a directory.
+# Убираем из имени отчета символы вроде /.
 safe_name() {
     local value=$1 character index
     for ((index=0; index<${#value}; index++)); do
