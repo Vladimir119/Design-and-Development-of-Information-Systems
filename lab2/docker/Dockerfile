@@ -1,9 +1,10 @@
-FROM python:3.13.7-slim-bookworm AS builder
+FROM python:3.13.7-slim-bookworm@sha256:adafcc17694d715c905b4c7bebd96907a1fd5cf183395f0ebc4d3428bd22d92d AS builder
 WORKDIR /build
+ENV SOURCE_DATE_EPOCH=0
 COPY app.py .
 RUN python -m py_compile app.py && cp __pycache__/app.*.pyc app.pyc
 
-FROM python:3.13.7-slim-bookworm AS runtime
+FROM python:3.13.7-slim-bookworm@sha256:adafcc17694d715c905b4c7bebd96907a1fd5cf183395f0ebc4d3428bd22d92d AS runtime
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     APP_MESSAGE="Lab 2"
