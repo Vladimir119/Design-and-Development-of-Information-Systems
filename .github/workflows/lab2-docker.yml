@@ -1,0 +1,23 @@
+name: Lab 2.1
+on:
+  push:
+    branches: [lab2-docker]
+    paths:
+      - 'lab2/docker/**'
+      - '!lab2/docker/screenshots/**'
+      - '!lab2/docker/README.md'
+      - '.github/workflows/lab2-docker.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash lab2/docker/check.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lab2-docker-screenshots
+          path: lab2/docker/screenshots/
