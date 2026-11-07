@@ -1,0 +1,48 @@
+- name: Установить Nginx
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+
+- name: Настроить Nginx
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    mode: '0644'
+    validate: /usr/sbin/nginx -t -c %s
+  notify: Перезапустить Nginx
+
+- name: Настроить запуск Nginx
+  ansible.builtin.copy:
+    dest: /etc/supervisor/conf.d/nginx.conf
+    mode: '0644'
+    content: |
+      [program:nginx]
+      command=/usr/sbin/nginx -g "daemon off;"
+      autostart=true
+      autorestart=true
+      stopsignal=QUIT
+      stdout_logfile=/var/log/nginx-supervisor.log
+      stderr_logfile=/var/log/nginx-supervisor-error.log
+  notify: Перезапустить Nginx
+
+- name: Применить конфигурацию
+  ansible.builtin.meta: flush_handlers
+
+- name: Проверить процесс
+  ansible.builtin.command: supervisorctl status nginx
+  register: nginx_process
+  changed_when: false
+  failed_when: nginx_process.rc not in [0, 3]
+
+- name: Запустить остановленный Nginx
+  ansible.builtin.command: supervisorctl start nginx
+  when: "'RUNNING' not in nginx_process.stdout"
+  changed_when: true
+
+- name: Проверить прокси
+  ansible.builtin.uri:
+    url: http://127.0.0.1/health
+  register: proxy_health
+  retries: 10
+  delay: 1
+  until: proxy_health.status == 200

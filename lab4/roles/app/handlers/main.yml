@@ -1,0 +1,7 @@
+- name: Перезапустить приложение
+  ansible.builtin.shell: |
+    set -e
+    supervisorctl reread
+    supervisorctl update
+    supervisorctl restart labapp
+  changed_when: true

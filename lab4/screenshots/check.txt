@@ -1,0 +1,26 @@
+$ docker compose ps
+NAME                  IMAGE               COMMAND                  SERVICE   CREATED              STATUS                        PORTS
+lab4-check-app-1      lab4-check-app      "/usr/local/bin/targ…"   app       About a minute ago   Up 2 seconds
+lab4-check-master-1   lab4-check-master   "/ansible/docker/mas…"   master    About a minute ago   Up About a minute (healthy)
+lab4-check-nginx-1    lab4-check-nginx    "/usr/local/bin/targ…"   nginx     About a minute ago   Up 2 seconds                  0.0.0.0:8080->80/tcp, [::]:8080->80/tcp
+$ docker compose exec nginx supervisorctl status
+nginx                            RUNNING   pid 22, uptime 0:00:01
+$ docker compose exec app supervisorctl status
+labapp                           RUNNING   pid 21, uptime 0:00:01
+$ curl -i localhost:8080/health
+HTTP/1.1 200 OK
+Server: nginx/1.22.1
+Date: Sat, 07 Nov 2026 22:46:43 GMT
+Content-Type: application/json
+Content-Length: 16
+Connection: keep-alive
+
+{"status": "ok"}
+$ curl localhost:8080/
+{"message": "Lab 4"}
+Second playbook run:
+PLAY RECAP *********************************************************************
+app                        : ok=12   changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+nginx                      : ok=11   changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+
+Configuration update and container restart: OK

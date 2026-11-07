@@ -1,0 +1,5 @@
+.env
+*.retry
+__pycache__/
+*.pem
+id_ed25519*
