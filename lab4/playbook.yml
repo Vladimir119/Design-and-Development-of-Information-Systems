@@ -1,0 +1,21 @@
+- name: Подготовка серверов
+  hosts: all
+  gather_facts: false
+  pre_tasks:
+    - name: Дождаться SSH
+      ansible.builtin.wait_for_connection:
+        timeout: 90
+    - name: Собрать сведения о серверах
+      ansible.builtin.setup:
+  roles:
+    - common
+
+- name: Деплой приложения
+  hosts: application
+  roles:
+    - app
+
+- name: Настройка Nginx
+  hosts: web
+  roles:
+    - nginx

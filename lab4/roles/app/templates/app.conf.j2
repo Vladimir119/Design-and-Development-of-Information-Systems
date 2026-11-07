@@ -1,0 +1,9 @@
+[program:labapp]
+command=/opt/labapp/start.sh
+directory=/opt/labapp
+user=labapp
+environment=APP_MESSAGE="{{ app_message }}",APP_PORT="{{ app_port }}"
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/labapp.log
+stderr_logfile=/var/log/labapp-error.log

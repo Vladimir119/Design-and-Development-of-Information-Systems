@@ -1,0 +1,44 @@
+services:
+  master:
+    build:
+      context: .
+      dockerfile: docker/master.Dockerfile
+    volumes:
+      - ssh_private:/keys
+      - ssh_public:/public
+    networks: [lab]
+    healthcheck:
+      test: ["CMD", "test", "-s", "/public/id_ed25519.pub"]
+      interval: 2s
+      retries: 15
+
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/target.Dockerfile
+    volumes:
+      - ssh_public:/public:ro
+    ports:
+      - "8080:80"
+    networks: [lab]
+    depends_on:
+      master:
+        condition: service_healthy
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/target.Dockerfile
+    volumes:
+      - ssh_public:/public:ro
+    networks: [lab]
+    depends_on:
+      master:
+        condition: service_healthy
+
+networks:
+  lab:
+
+volumes:
+  ssh_private:
+  ssh_public:

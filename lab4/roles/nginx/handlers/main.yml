@@ -1,0 +1,7 @@
+- name: Перезапустить Nginx
+  ansible.builtin.shell: |
+    set -e
+    supervisorctl reread
+    supervisorctl update
+    supervisorctl restart nginx
+  changed_when: true

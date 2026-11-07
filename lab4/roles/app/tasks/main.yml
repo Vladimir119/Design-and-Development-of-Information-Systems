@@ -1,0 +1,50 @@
+- name: Создать пользователя
+  ansible.builtin.user:
+    name: labapp
+    system: true
+    create_home: false
+    shell: /usr/sbin/nologin
+
+- name: Создать каталог
+  ansible.builtin.file:
+    path: /opt/labapp
+    state: directory
+    mode: '0755'
+
+- name: Распаковать приложение
+  ansible.builtin.unarchive:
+    src: /opt/app.tar.gz
+    dest: /opt/labapp
+    owner: root
+    group: root
+    mode: '0755'
+  notify: Перезапустить приложение
+
+- name: Настроить запуск
+  ansible.builtin.template:
+    src: app.conf.j2
+    dest: /etc/supervisor/conf.d/labapp.conf
+    mode: '0644'
+  notify: Перезапустить приложение
+
+- name: Применить конфигурацию
+  ansible.builtin.meta: flush_handlers
+
+- name: Проверить процесс
+  ansible.builtin.command: supervisorctl status labapp
+  register: app_process
+  changed_when: false
+  failed_when: app_process.rc not in [0, 3]
+
+- name: Запустить остановленное приложение
+  ansible.builtin.command: supervisorctl start labapp
+  when: "'RUNNING' not in app_process.stdout"
+  changed_when: true
+
+- name: Проверить health
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ app_port }}/health"
+  register: app_health
+  retries: 10
+  delay: 1
+  until: app_health.status == 200

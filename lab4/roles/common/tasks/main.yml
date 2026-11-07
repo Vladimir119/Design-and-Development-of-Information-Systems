@@ -1,0 +1,20 @@
+- name: Проверить сервер
+  ansible.builtin.assert:
+    that:
+      - ansible_facts['distribution'] == 'Debian'
+      - ansible_facts['distribution_major_version'] == '12'
+      - ansible_facts['user_id'] == 'root'
+      - ansible_facts['memtotal_mb'] >= 128
+    fail_msg: Нужен Debian 12, root и минимум 128 МБ памяти
+
+- name: Установить компоненты
+  ansible.builtin.apt:
+    name: [python3, supervisor, ca-certificates]
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Запустить Supervisor
+  ansible.builtin.sysvinit:
+    name: supervisor
+    state: started
