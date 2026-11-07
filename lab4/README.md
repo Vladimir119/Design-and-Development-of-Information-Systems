@@ -75,3 +75,10 @@ docker compose down
 
 Проверка в GitHub Actions запускает деплой на чистых контейнерах, повторный
 плейбук, обновление сообщения и restart. Скриншоты результатов — в `screenshots`.
+
+[Успешный запуск проверки](https://github.com/Vladimir119/Design-and-Development-of-Information-Systems/actions/runs/42422070252).
+Первый скриншот — вывод команд с Ubuntu runner, второй — ответ приложения
+в браузере через Nginx.
+
+![Контейнеры и деплой](screenshots/status.png)
+![Health](screenshots/health.png)
